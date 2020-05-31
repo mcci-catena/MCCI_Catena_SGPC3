@@ -38,13 +38,13 @@ Clients interact with the gas sensor via the following sequence.
 
 2. The SGPC3 does not a have a reset pin. It is reset either by power-cycling or by a soft reset.
 
-2. If the client has a saved baseline, the user should load the value into the library using `cSGPC3::setBaseline()`.
+3. If the client has a saved baseline, the user should load the value into the library using `cSGPC3::setBaseline()`.
 
-3. To begin measurements, the client calls the `cSGPC3::begin()` method.
+4. To begin measurements, the client calls the `cSGPC3::begin()` method.
 
-4. If the client only needs to take occasional measurements, the client calls either the `cSHT3x::getTemperatureHumidity()` method (which returns temperature and humidity scaled in engineering units), or `cSHT3x::getTemperatureHumidityRaw()` (which returns temperature and humidity as `uint16_t` unscaled values).  Generally, the former is used if data is to be processed locally on the Arduino, and the latter is used if data is to be transmitted via a LPWAN network.
+5. If the client only needs to take occasional measurements, the client calls either the `cSHT3x::getTemperatureHumidity()` method (which returns temperature and humidity scaled in engineering units), or `cSHT3x::getTemperatureHumidityRaw()` (which returns temperature and humidity as `uint16_t` unscaled values).  Generally, the former is used if data is to be processed locally on the Arduino, and the latter is used if data is to be transmitted via a LPWAN network.
 
-3. If the client needs to make periodic measurements, the client first calls `cSHT3x::startPeriodicMeasurement()` to set the parameters for the periodic measurement, and start the acquisition process. The result of this call is the number of milliseconds per measurement.
+6. If the client needs to make periodic measurements, the client first calls `cSHT3x::startPeriodicMeasurement()` to set the parameters for the periodic measurement, and start the acquisition process. The result of this call is the number of milliseconds per measurement.
 
    To collect results, the client occasionaly calls `cSHT3x::getPeriodicMeasurement()` or `cSHT3x::getPeriodicMeasurementRaw()`. If a measurement is available, it will be returned, and the method returns `true`; otherwise, the method returns `false`.  To save power, the client should delay the appropriate number of milliseconds between calls (as indicated by the result of `cSHT3x::startPeriodicMeasurement()`).
 
@@ -76,13 +76,13 @@ None, beyond the normal Arduino library `<Wire.h>`.  It can be used with [Catena
 
 ## Example Scripts
 
-See [sht3x-simple](./examples/sht3x-simple/sht3x-simple.ino). Sht3x-simple reads and displays the temperature and humidity once a second, using the simple APIs.
+See [sht3x-simple](./examples/sht3x-simple/sht3x-simple.ino). Sht3x-simple reads and displays the TVOC once a second, using the simple APIs.
 
 ![Screenshot of sht3x-simple.ino in operation](./assets/sht3x-simple-screenshot.png)
 
 ## Namespace
 
-All definitions are wrapped in a namespace. Normally, after incluing the header file, you'll want to say:
+All definitions are wrapped in a namespace. Normally, after including the header file, you'll want to say:
 
 ```c++
 using namespace McciCatenaSht3x;
@@ -125,7 +125,7 @@ cSHT3x mySHT3x(
 
 ## Converting between modes and command words
 
-The SHT3x datasheet doesn't give the algorighm (if any) for computing the internal checksums for commands, nor the internal bit structure of the commands. Despite the obvious regularity, we decided to resort to some hairy `constexpr` functions to allow us to build and decode commmands cleanly.
+The SHT3x datasheet doesn't give the algorithm (if any) for computing the internal checksums for commands, nor the internal bit structure of the commands. Despite the obvious regularity, we decided to resort to some hairy `constexpr` functions to allow us to build and decode commands cleanly.
 
 ```c++
 enum McciCatenaSht3x::cSHT3x::Repeatability : std::int8_t { Error=-1, NA, Low, Medium, High };
