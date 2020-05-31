@@ -177,6 +177,7 @@ protected:
     static constexpr std::uint32_t kFeatureMask = 0xF << 20;
     static constexpr std::uint32_t kDelayMask = 0xFF << 24;
 
+public:
     /// \brief Construct an SGPC3 command description constant.
     ///
     /// \param code [in]        The command code, from the datasheet.
@@ -195,6 +196,8 @@ protected:
                 ((std::uint32_t(delayMs) << 24) & kDelayMask)
                 );
         }
+
+protected:
     /// \brief Extract command bytes from command constant.
     static constexpr std::uint16_t getCommand(Command_t c)
         {
@@ -368,7 +371,7 @@ protected:
         static_assert(getParameterLength(c) == 0, "command takes parameters");
         static_assert(getResponseLength(c) == 0, "command returns response");
         auto eSupported = this->isSupported(c);
-        if (! isSupported(eSupported))
+        if (! isSuccess(eSupported))
             return eSupported; 
         return this->sendCommandBare(c);
         }
@@ -382,9 +385,9 @@ protected:
         static_assert(getParameterLength(c) == 1, "wrong number of parameters for command");
         static_assert(getResponseLength(c) == 0, "command returns response");
         auto eSupported = this->isSupported(c);
-        if (! isSupported(eSupported))
+        if (! isSuccess(eSupported))
             return eSupported; 
-        return this->sendCommandParam(c, param);
+        return this->sendCommandWithParam(c, param);
         }
     /// \brief Send a commmand synchronously, with one response.
     /// \tparam c   The command to be sent.
@@ -396,7 +399,7 @@ protected:
         static_assert(getParameterLength(c) == 0, "command takes parameters");
         static_assert(getResponseLength(c) == 1, "command response length != 1");
         auto eSupported = this->isSupported(c);
-        if (! isSupported(eSupported))
+        if (! isSuccess(eSupported))
             return eSupported; 
         return this->sendCommandWithResponse(c, response);
         }
@@ -411,7 +414,7 @@ protected:
         static_assert(getParameterLength(c) == 0, "command takes parameters");
         static_assert(getResponseLength(c) == 2, "command response length != 2");
         auto eSupported = this->isSupported(c);
-        if (! isSupported(eSupported))
+        if (! isSuccess(eSupported))
             return eSupported; 
         return this->sendCommandWithTwoResponses(c, response1, response2);
         }
@@ -425,12 +428,14 @@ protected:
         static_assert(getParameterLength(c) == 0, "command takes parameters");
         static_assert(getResponseLength(c) == 3, "command response length != 3");
         auto eSupported = this->isSupported(c);
-        if (! isSupported(eSupported))
+        if (! isSuccess(eSupported))
             return eSupported; 
         return this->sendCommandWithThreeResponses(c, response);
         }
 
 private:
+    /// \brief Send command without parameter or response.
+    Error_t sendCommandBare(Command_t c);
     /// \brief Send command with param, no response
     Error_t sendCommandWithParam(Command_t c, uint16_t param);
     /// \brief Send command with one response word
@@ -445,7 +450,7 @@ public:
     /// \brief Set the sensor into continuous measurement mode.
     Error_t tvoc_init_continuous(void)
         {
-        auto result = this->isSupported(Command_t::tvoc_init_continuous));
+        auto result = this->isSupported(Command_t::tvoc_init_continuous);
         if (isSuccess(result))
             result = this->sendSynchronous<Command_t::tvoc_init_continuous>();
         return result;
