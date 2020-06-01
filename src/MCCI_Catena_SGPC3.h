@@ -3,13 +3,13 @@
 Module: MCCI_Catena_SGPC3.h
 
 Function:
-        Definitions for the Catena library for the Sensirion SGPC3 TVOC sensor.
+    Definitions for the Catena library for the Sensirion SGPC3 TVOC sensor.
 
 Copyright and License:
-        See accompanying LICENSE file.
+    See accompanying LICENSE file.
 
 Author:
-        Terry Moore, MCCI Corporation   May 2020
+    Terry Moore, MCCI Corporation   May 2020
 
 */
 
@@ -45,7 +45,7 @@ namespace std {
 #include <Wire.h>
 
 
-/// \brief Namespace used for all definitions in this module
+/// \brief Namespace used for all definitions in this library.
 ///
 /// \details
 ///     All names contributed by this library are in the namespace
@@ -62,23 +62,25 @@ namespace McciCatenaSGPC3 {
 |
 \****************************************************************************/
 
-/// \defgroup version Version numbers for the library
-///
-/// \brief The version number framework allows compile-time checks of library versions.
-///
-/// \details
-///     It's often desirable to check at compile time that the library version
-///     in use is up to date. The alternative may be compile errors that will
-///     be puzzling to casual users.
-///
-///     The semantics of version numbers are based on [Semantic Versioning](www.semver.org) version 2,
-///     extended to support a fourth field, "local", and omitting the pre-release
-///     field. In general, the major, minor, and patch fields are reserved for
-///     public (github) version tags. The local version is used for tagging version
-///     numbers that are on HEAD or public branches, and therefore must be
-///     distinguished. They're similar to pre-release tags, but they
-///     represent points *after* a release, rather than points *before* a release.
-///
+/*! \defgroup version Version numbers for the library
+
+\brief The version number framework allows compile-time checks of library versions.
+
+\details
+    It's often desirable to check at compile time that the library version
+    in use is up to date. The alternative may be compile errors that will
+    be puzzling to casual users.
+
+    The semantics of version numbers are based on [Semantic Versioning](www.semver.org) version 2,
+    extended to support a fourth field, "local", and omitting the pre-release
+    field. In general, the major, minor, and patch fields are reserved for
+    public (github) version tags. The local version is used for tagging version
+    numbers that are on HEAD or public branches, and therefore must be
+    distinguished. They're similar to pre-release tags, but they
+    represent points *after* a release, rather than points *before* a release.
+
+*/
+
 /// \{
 
 /// \brief Create a version number suitable for comparison.
@@ -88,8 +90,7 @@ namespace McciCatenaSGPC3 {
 /// \param      patch   Patch number. See [Semantic Versioning V2.0](https://semver.org/spec/v2.0.0.html).
 /// \param      local   Local release (optional).
 ///
-static constexpr std::uint32_t
-makeVersion(
+constexpr std::uint32_t makeVersion(
     std::uint8_t major, std::uint8_t minor, std::uint8_t patch, std::uint8_t local = 0
     )
     {
@@ -100,8 +101,7 @@ makeVersion(
 ///
 /// \details
 ///     This is only intended to be used when printing a version number.
-static constexpr std::uint8_t
-getMajor(std::uint32_t v)
+constexpr std::uint8_t getMajor(std::uint32_t v)
     {
     return std::uint8_t(v >> 24u);
     }
@@ -110,8 +110,7 @@ getMajor(std::uint32_t v)
 ///
 /// \details
 ///     This is only intended to be used when printing a version number.
-static constexpr std::uint8_t
-getMinor(std::uint32_t v)
+constexpr std::uint8_t getMinor(std::uint32_t v)
     {
     return std::uint8_t(v >> 16u);
     }
@@ -120,8 +119,7 @@ getMinor(std::uint32_t v)
 ///
 /// \details
 ///     This is only intended to be used when printing a version number.
-static constexpr std::uint8_t
-getPatch(std::uint32_t v)
+constexpr std::uint8_t getPatch(std::uint32_t v)
     {
     return std::uint8_t(v >> 8u);
     }
@@ -130,8 +128,7 @@ getPatch(std::uint32_t v)
 ///
 /// \details
 ///     This is only intended to be used when printing a version number.
-static constexpr std::uint8_t
-getLocal(std::uint32_t v)
+constexpr std::uint8_t getLocal(std::uint32_t v)
     {
     return std::uint8_t(v);
     }
@@ -147,7 +144,7 @@ getLocal(std::uint32_t v)
 ///             McciCatenaSGPC3::kVersion >= McciCatenaSGPC3::makeVersion(0,1,0),
 ///             "MCCI_Catena_SGPC3 library version is out of date");
 ///     ```
-static constexpr std::uint32_t kVersion = makeVersion(0,1,0,0);
+constexpr std::uint32_t kVersion = makeVersion(0,1,0,0);
 
 //  endgroup version
 /// \}
@@ -174,7 +171,7 @@ protected:
     static constexpr std::uint32_t kCommandMask = 0x3FFF << 0;
     static constexpr std::uint32_t kParamLenMask = 0x1 << 16;
     static constexpr std::uint32_t kResponseLenMask = 0x7 << 17;
-    static constexpr std::uint32_t kFeatureMask = 0xF << 20;
+    static constexpr std::uint32_t kVersionMask = 0xF << 20;
     static constexpr std::uint32_t kDelayMask = 0xFF << 24;
 
 public:
@@ -184,15 +181,16 @@ public:
     /// \param paramLen [in]    The number of bytes of parameter (including CRC), from datasheet.
     /// \param responseLen [in] The bytes of expected response.
     /// \param delayMs [in]     The number of milliseconds to delay between issuing the command/parameters and looking for a response.
-    /// \param featureSet [in]  The chip version neded to support this command.
+    /// \param chipVersion [in]  The chip version neded to support this command. The default is version 4,
+    ///                         based on a review of the Sensirion reference code.
     ///
-    static constexpr std::uint32_t CommandInit(std::uint16_t code, std::uint8_t paramLen, std::uint8_t responseLen, std::uint8_t delayMs, std::uint8_t featureSet = 0)
+    static constexpr std::uint32_t CommandInit(std::uint16_t code, std::uint8_t paramLen, std::uint8_t responseLen, std::uint8_t delayMs, std::uint8_t chipVersion = 4)
         {
         return std::uint32_t(
                 (code & kCommandMask) |
                 ((std::uint32_t(paramLen / 3) << 16) & kParamLenMask) |
                 ((std::uint32_t(responseLen / 3) << 17) & kResponseLenMask) |
-                ((std::uint32_t(featureSet) << 20) & kFeatureMask) | 
+                ((std::uint32_t(chipVersion) << 20) & kVersionMask) | 
                 ((std::uint32_t(delayMs) << 24) & kDelayMask)
                 );
         }
@@ -214,9 +212,9 @@ protected:
         return ((std::uint32_t(c) & kResponseLenMask) >> 17);
         }
     /// \brief Extract required feature set leval from command constant.
-    static constexpr std::uint8_t getFeatureSet(Command_t c)
+    static constexpr std::uint8_t getChipVersion(Command_t c)
         {
-        return ((std::uint32_t(c) & kFeatureMask) >> 20);
+        return ((std::uint32_t(c) & kVersionMask) >> 20);
         }
     /// \brief Extract delay (in milliseconds) from command constant.
     static constexpr std::uint32_t getDelayMs(Command_t c)
@@ -237,7 +235,11 @@ enum class cSGPC3_cmds::Command_t : std::uint32_t {
     measure_tvoc                   = CommandInit(0x2008, 0, 3, 50),    ///< Measure TVOC.
     get_tvoc_baseline              = CommandInit(0x2015, 0, 3, 10),    ///< Get the baseline value.
     set_tvoc_baseline              = CommandInit(0x201e, 3, 0, 10),    ///< Set the baseline value.
-    get_feature_set_version        = CommandInit(0x202f, 0, 3, 10),    ///< Get feature-set version for this device.
+    /// \brief Get feature-set version for this device.
+    /// \details
+    ///     The required chip version for this command is zero, meaning that we don't require any
+    ///     specific version.
+    get_feature_set_version        = CommandInit(0x202f, 0, 3, 10, 0), ///< Get feature-set version for this device.
     measure_test                   = CommandInit(0x2032, 0, 3, 220),   ///< Test mode; manufacturing.
     measure_tvoc_and_raw           = CommandInit(0x2046, 0, 6, 50),    ///< Get TVOC and raw data.
     measure_raw                    = CommandInit(0x204d, 0, 3, 50),    ///< Measure raw concentration.
@@ -283,11 +285,13 @@ enum class cSGPC3_cmds::Command_t : std::uint32_t {
 class cSGPC3 : public cSGPC3_cmds
     {
 private:
+    /// \brief Type of value returned by \c millis().
     using Millisecond_t = decltype(millis());
 
-public:
     /// \brief Control result of isDebug(); use for compiling debug code in/out.
     static constexpr bool kfDebug = false;
+
+public:
 
     /// \brief The SCPC3 I2C address. This is fixed by design.
     static constexpr std::int8_t kAddress = 0x58;
@@ -311,6 +315,10 @@ public:
         Failure,                    ///< The operation failed for no specific reason.
         InvalidParmameter,          ///< The operation failed because a paramter was not valid.
         NotSupported,               ///< The operation failed because the sensor doesn't support the command.
+        WrongDeviceType,            ///< The operation failed because the sensor reported an unsupported device type.
+        WriteError,                 ///< The operation failed while writing due to an error from the \ref TwoWire system.
+        ReadError,                  ///< The operation failed while reading due to an error from the \ref TwoWire system.
+        BadCRC,                     ///< THe operation failed because a CRC check didn't match on received data.
         };
 
     /// \brief Test an Error_t value to see whether it represents a successful operation.
@@ -348,14 +356,18 @@ public:
     /// \brief Instances of this class are neither copyable nor movable.
     cSGPC3& operator=(const cSGPC3&&) = delete;
 
-    /// \brief Initialze the SGPC3.
-    bool begin();
+    /// \brief Initialze the SGPC3, and fetch the feature set.
+    Error_t begin(PowerMode_t mode = PowerMode_t::UltraLow);
 
     /// \brief Deinitialize the SGPC3.
     void end();
 
+    /// \brief Query whether the library was built with debugging enabled.
+    static constexpr bool isDebug() { return kfDebug; }
+
 protected:
     /// \brief Send command with neither parameter nor response.
+    /// \tparam c   The command to be sent.
     /// \details
     ///     Check (at compile time) whether the command can be used with this routine.
     ///     Check (at run time) whether the command is supported by the discovered sensor.
@@ -418,7 +430,7 @@ protected:
             return eSupported; 
         return this->sendCommandWithTwoResponses(c, response1, response2);
         }
-    /// \brief Send a commmand synchronously, with a 64-bit response
+    /// \brief Send a commmand synchronously, with a 64-bit response.
     /// \tparam c   The command to be sent.
     /// \param response [out]   set to the 3-word response formatted as a uint64_t in host-native byte order.
     /// \copydetails sendSynchronous()
@@ -437,14 +449,42 @@ private:
     /// \brief Send command without parameter or response.
     Error_t sendCommandBare(Command_t c);
     /// \brief Send command with param, no response
-    Error_t sendCommandWithParam(Command_t c, uint16_t param);
+    Error_t sendCommandWithParam(Command_t c, std::uint16_t param);
     /// \brief Send command with one response word
-    Error_t sendCommandWithResponse(Command_t c, uint16_t &response);
+    Error_t sendCommandWithResponse(Command_t c, std::uint16_t &response);
     /// \brief Send command with two response words
-    Error_t sendCommandWithTwoResponses(Command_t c, uint16_t &response1, std::uint16_t &response2);
+    Error_t sendCommandWithTwoResponses(Command_t c, std::uint16_t &response1, std::uint16_t &response2);
     /// \brief Send command with three response words
-    Error_t sendCommandWithThreeResponses(Command_t c, uint64_t &response);
-    /// \brief Send `sgpc3_tvoc_init_continuous` command
+    Error_t sendCommandWithThreeResponses(Command_t c, std::uint64_t &response);
+    /// \brief Send command, parameter bytes, result bytes
+    Error_t sendCommand(Command_t c, const std::uint8_t *pParamBytes, std::uint8_t *pResultBytes);
+
+    /// \brief Product type codes.
+    enum class ProductType_t : std::uint8_t
+        {
+        SGPC3 = 1,      ///< Device is an SGPC3
+        };
+
+    static constexpr ProductType_t featureSet_getProductType(std::uint16_t fs)
+        {
+        return ProductType_t((fs >> 12) & 0xF);
+        }
+    static constexpr std::uint8_t featureSet_getProductVersion(std::uint16_t fs)
+        {
+        return fs & 0xFF;
+        }
+
+    /// \brief Write a big-endian value to a buffer.
+    static inline void putbe16(std::uint8_t *pBuf, std::uint16_t v)
+        {
+        pBuf[0] = std::uint8_t(v >> 8);
+        pBuf[1] = std::uint8_t(v);
+        }
+    /// \brief Read a big-endian value from a buffer.
+    static constexpr std::uint16_t getbe16(const std::uint8_t *pBuf)
+        {
+        return std::uint16_t(pBuf[0] << 8) | pBuf[1];
+        }
 
 public:
     /// \brief Set the sensor into continuous measurement mode.
@@ -493,11 +533,14 @@ public:
 private:
     Error_t isSupported(Command_t c) const
         {
-        if (this->m_featureSet < getFeatureSet(c))
+        if (this->m_featureSet < getChipVersion(c))
             return Error_t::NotSupported;
         else
             return Error_t::Success;
         }
+    /// \brief Calculate the Sensirion CRC over a bufffer.
+    static std::uint8_t crc(const std::uint8_t * buf, size_t nBuf, std::uint8_t crc8 = 0xFF);
+
 private:
     /// \brief the I2C bus to use for communication.
     TwoWire *m_wire;
