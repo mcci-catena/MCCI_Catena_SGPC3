@@ -13,10 +13,13 @@ Author:
 
 */
 
+/// \file
+
 #include "../MCCI_Catena_SGPC3.h"
 
 using namespace McciCatenaSGPC3;
 
+/// \brief  Initialze the SGPC3, and fetch the feature set. 
 /// \details
 ///     This function fetches the version of the SGPC3. If the version suitable,
 ///     the chip is initialized for continuous operation in the specified power mode.

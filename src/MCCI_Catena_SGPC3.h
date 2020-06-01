@@ -20,6 +20,16 @@ Author:
 /// \file
 
 // AVR doesn't have <cstdint> but we want to use it... so work around it.
+
+#ifdef _DOXYGEN_
+/// \brief Configure whether <cstdint> header file should be used.
+/// \details
+///     C++ for AVR processors doesn't include <cstdint>. For portability, the
+///     library follows the MCCI Catena convention of using <cstdint> if possible,
+///     or defining the main <cstdint> results using information from <stdint.h>.
+# define __CATENA_HAVE_CSTDINT 1
+#endif
+
 #ifndef __CATENA_HAVE_CSTDINT
 # ifdef __AVR__
 #  define _CATENA_HAVE_CSTDINT	0
@@ -316,8 +326,8 @@ public:
         InvalidParmameter,          ///< The operation failed because a paramter was not valid.
         NotSupported,               ///< The operation failed because the sensor doesn't support the command.
         WrongDeviceType,            ///< The operation failed because the sensor reported an unsupported device type.
-        WriteError,                 ///< The operation failed while writing due to an error from the \ref TwoWire system.
-        ReadError,                  ///< The operation failed while reading due to an error from the \ref TwoWire system.
+        WriteError,                 ///< The operation failed while writing due to an error from the \c TwoWire system.
+        ReadError,                  ///< The operation failed while reading due to an error from the \c TwoWire system.
         BadCRC,                     ///< THe operation failed because a CRC check didn't match on received data.
         };
 
@@ -465,21 +475,28 @@ private:
         SGPC3 = 1,      ///< Device is an SGPC3
         };
 
+    /// \brief Extract product type from a feature-set response.
     static constexpr ProductType_t featureSet_getProductType(std::uint16_t fs)
         {
         return ProductType_t((fs >> 12) & 0xF);
         }
+
+    /// \brief Extract product version from a feature-set response.
     static constexpr std::uint8_t featureSet_getProductVersion(std::uint16_t fs)
         {
         return fs & 0xFF;
         }
 
-    /// \brief Write a big-endian value to a buffer.
+    /// \brief Write a value to a buffer in big-endian order.
+    ///
+    /// \param pBuf [out]   Pointer to a 2-byte buffer.
+    /// \param v [in]       Value to be written.
     static inline void putbe16(std::uint8_t *pBuf, std::uint16_t v)
         {
         pBuf[0] = std::uint8_t(v >> 8);
         pBuf[1] = std::uint8_t(v);
         }
+
     /// \brief Read a big-endian value from a buffer.
     static constexpr std::uint16_t getbe16(const std::uint8_t *pBuf)
         {
@@ -531,6 +548,17 @@ public:
         }
 
 private:
+    /// \brief  Test whether a command is supported by the sensor being controlled.
+    ///
+    /// \param c [in]   The command description.
+    ///
+    /// \details
+    ///     We extract the required chip version from \p c, and compare to the cached
+    ///     chip version.
+    ///
+    /// \retval Error_t::Success    The command is supported by the sensor.
+    /// \retval Error_t::NotSupported The command is not supported by the sensor.
+    ///
     Error_t isSupported(Command_t c) const
         {
         if (this->m_featureSet < getChipVersion(c))
@@ -538,6 +566,7 @@ private:
         else
             return Error_t::Success;
         }
+
     /// \brief Calculate the Sensirion CRC over a bufffer.
     static std::uint8_t crc(const std::uint8_t * buf, size_t nBuf, std::uint8_t crc8 = 0xFF);
 
